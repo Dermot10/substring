@@ -2,6 +2,7 @@ import unittest
 import tempfile
 import os
 import re
+import unicodedata
 from main import FileProcessor
 from log import logger 
 
@@ -160,6 +161,23 @@ class TestFileProcessing(unittest.TestCase):
         
         self.assertIsInstance(result, list)
 
+    def test_unicode_characters(self):
+        
+        test_string = "i told_her334Le vent se 7%3lève! . . . Il faut te@£nter de viv5)re!"
+        unicode_char = "è"
+        output_string = ""
+
+        for index, char in enumerate(test_string): 
+            if unicodedata.category(char)[0] == 'L':  # check if character is a letter
+                output_string += char
+                if index < len(test_string) - 1 and unicodedata.category(test_string[index+1])[0] != 'L':
+                    output_string += " "
+            elif char == "_":  
+                output_string += " "
+        
+        self.assertIn(unicode_char, output_string) #assert that unicode character should be accounted for and added to the output string 
+
+
 
     def test_yield_function(self): 
         """Test ensuring generator function returns list object"""
@@ -176,6 +194,7 @@ if __name__ == "__main__":
     
     test.setUp()
     test.print_contents()
+    test.test_unicode_characters()
 
     
     

@@ -2,10 +2,9 @@ import os
 import sys
 import re
 from log import logger
+import unicodedata
 
 
-
-# may need to make while loop run till lines are fully read in file as opposed to indefinetly
 class FileProcessor:
     def __init__(self, logger):
         self.logger = logger
@@ -46,15 +45,15 @@ class FileProcessor:
                 if search_term in line: 
                     output_string = ""
                     for index, char in enumerate(line): 
-                        if char.isalpha(): #if character is letter add to string 
-                            output_string += char 
-                            if index < len(line) - 1 and not line[index+1].isalpha(): #if within bounds and next character is not letter add space
+                        if unicodedata.category(char)[0] == 'L':  # check if character is a letter
+                            output_string += char
+                            if index < len(line) - 1 and unicodedata.category(line[index+1])[0] != 'L':  #check next character if not unicode letter replace 
                                 output_string += " "
-                        elif char == "_":  #_  is included as letter not symbol character
+                        elif char == "_":  
                             output_string += " "
-                        if index < len(line) -1 and line[index+1] == "\n": # if end of line  
+                        if index < len(line) -1 and line[index+1] == "\n": 
                             output_string = output_string.strip()
-                            formatted_string = re.sub(r'\s+', " ", output_string) #replace all whitespace with single space to format list
+                            formatted_string = re.sub(r'\s+', " ", output_string)
                             result.append([formatted_string])
         return result 
                  
